@@ -33,8 +33,11 @@ namespace CrmPlugin
                     return;
                 }
                 var statecode = entity["statecode"] as OptionSetValue;
-                if (statecode == null || statecode.Value != 0 /*Active*/)
+                if (statecode == null 
+                    || (statecode.Value != 0 /*Active*/ 
+                        && statecode.Value != 1 /*Resolved*/))
                 {
+                    // Ignore cancelled incidents, that is, statecode == 2
                     return;
                 }
                 Entity preTarget = default;
@@ -55,11 +58,16 @@ namespace CrmPlugin
                         var now = DateTime.UtcNow;
                         incident["new_prior_statuscode"] = preTarget["statuscode"];
                         incident["new_statuscode_lastupdated"] = now;
-                        incident["new_statuscode_change_notified_cust_on"] = null;
+                        if (incident["new_statuscode_change_notified_cust_on"] != null 
+                            && now.CompareTo(incident["new_statuscode_change_notified_cust_on"]) < 0)
+                        {
+                            // Should not find future timestamps
+                            tracingSvc.Trace($"IncidentPlugin: new_statuscode_change_notified_cust_on found to be in the future!");
+                        }
+                        
                     }
                 }
 
-                /* Need to use code below for more complex logic and updates
                 IOrganizationServiceFactory svcFactory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
                 if (svcFactory == null)
                 {
@@ -73,7 +81,6 @@ namespace CrmPlugin
 
                 try
                 {
-
                 }
                 catch (FaultException<OrganizationServiceFault> ex)
                 {
@@ -83,7 +90,7 @@ namespace CrmPlugin
                 {
                     tracingSvc.Trace($"Error with IncidentPlugin: {ex.Message.ToString()}");
                 }
-                */
+
             }
         }
     }
