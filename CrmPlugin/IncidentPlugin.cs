@@ -32,10 +32,34 @@ namespace CrmPlugin
                     // We're not dealing with an Incident Entity, so should ignore
                     return;
                 }
+                var statecode = entity["statecode"] as OptionSetValue;
+                if (statecode == null || statecode.Value != 0 /*Active*/)
+                {
+                    return;
+                }
+                Entity preTarget = default;
+                if (ctx.PreEntityImages.Contains("PreEntityImage"))
+                {
+                    preTarget = ctx.PreEntityImages["PreEntityImage"];
+                }
+                Entity postTarget = default;
+                if (ctx.PostEntityImages.Contains("PostEntityImage"))
+                {
+                    postTarget = ctx.PostEntityImages["PostEntityImage"];
+                }
+                if (preTarget != default && postTarget != default)
+                {
+                    if (preTarget["statuscode"] != postTarget["statuscode"])
+                    {
+                        var incident = ctx.InputParameters["Target"] as Entity;
+                        var now = DateTime.UtcNow;
+                        incident["new_prior_statuscode"] = preTarget["statuscode"];
+                        incident["new_statuscode_lastupdated"] = now;
+                        incident["new_statuscode_change_notified_cust_on"] = null;
+                    }
+                }
 
-
-                
-
+                /* Need to use code below for more complex logic and updates
                 IOrganizationServiceFactory svcFactory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
                 if (svcFactory == null)
                 {
@@ -59,6 +83,7 @@ namespace CrmPlugin
                 {
                     tracingSvc.Trace($"Error with IncidentPlugin: {ex.Message.ToString()}");
                 }
+                */
             }
         }
     }
