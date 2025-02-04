@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
 using Microsoft.Xrm.Sdk;
+using System.Linq.Expressions;
 
 namespace CrmPlugin
 {
@@ -13,6 +14,15 @@ namespace CrmPlugin
         public void Execute(IServiceProvider serviceProvider)
         {
             ITracingService tracingSvc = (ITracingService)serviceProvider.GetService(typeof(ITracingService));
+
+            void LogValidationError(Guid incidentId, string validationError)
+            {
+                tracingSvc.Trace($"IncidentPlugin: {validationError} for incident id {incidentId}");
+            }
+            bool ValidateIncident(Entity incident)
+            {
+                return true;
+            }
 
             IPluginExecutionContext ctx = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
             if (ctx == null)
@@ -81,6 +91,7 @@ namespace CrmPlugin
 
                 try
                 {
+                    //If we need complex logic
                 }
                 catch (FaultException<OrganizationServiceFault> ex)
                 {

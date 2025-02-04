@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrmPlugin", "CrmPlugin\CrmP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrmWorkflow", "CrmWorkflow\CrmWorkflow.csproj", "{05B53EAB-B0A6-4E90-A9CE-6DFBD63F3C42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrmCreateSchema", "CrmCreateSchema\CrmCreateSchema.csproj", "{753D32BA-52E6-4F6B-824E-E958B9124375}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrmUploadData", "CrmUploadData\CrmUploadData.csproj", "{DD8B06D6-925C-4B49-98BF-D2E45979DB1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{05B53EAB-B0A6-4E90-A9CE-6DFBD63F3C42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05B53EAB-B0A6-4E90-A9CE-6DFBD63F3C42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05B53EAB-B0A6-4E90-A9CE-6DFBD63F3C42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{753D32BA-52E6-4F6B-824E-E958B9124375}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{753D32BA-52E6-4F6B-824E-E958B9124375}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{753D32BA-52E6-4F6B-824E-E958B9124375}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{753D32BA-52E6-4F6B-824E-E958B9124375}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD8B06D6-925C-4B49-98BF-D2E45979DB1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD8B06D6-925C-4B49-98BF-D2E45979DB1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD8B06D6-925C-4B49-98BF-D2E45979DB1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD8B06D6-925C-4B49-98BF-D2E45979DB1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
