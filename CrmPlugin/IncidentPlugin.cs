@@ -21,7 +21,24 @@ namespace CrmPlugin
             }
             bool ValidateIncident(Entity incident)
             {
-                return true;
+                var failedValidation = false;
+                if (string.IsNullOrEmpty(incident["emailaddress"] as string))
+                {
+                    LogValidationError(incident.Id, "Missing email address");
+                    failedValidation = true;
+                }
+                if (string.IsNullOrEmpty(incident["title"] as string))
+                {
+                    LogValidationError(incident.Id, "Missing title");
+                    failedValidation = true;
+                }
+                if (incident["customerid"] is null)
+                {
+                    LogValidationError(incident.Id, "Missing customer id");
+                    failedValidation = true;
+                }
+
+                return !failedValidation;
             }
 
             IPluginExecutionContext ctx = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
@@ -36,13 +53,14 @@ namespace CrmPlugin
                 (ctx.InputParameters["Target"] as Entity)?.LogicalName == "incident"
                 )
             {
-                var entity = (Entity)ctx.InputParameters["Target"];
-                if (entity.LogicalName.ToLower() != "incident")
+                var incident = (Entity)ctx.InputParameters["Target"];
+
+                if (!ValidateIncident(incident))
                 {
-                    // We're not dealing with an Incident Entity, so should ignore
-                    return;
+                    throw new InvalidPluginExecutionException($"Incident with id {incident.Id} failed validation.");
                 }
-                var statecode = entity["statecode"] as OptionSetValue;
+
+                var statecode = incident["statecode"] as OptionSetValue;
                 if (statecode == null 
                     || (statecode.Value != 0 /*Active*/ 
                         && statecode.Value != 1 /*Resolved*/))
@@ -64,7 +82,6 @@ namespace CrmPlugin
                 {
                     if (preTarget["statuscode"] != postTarget["statuscode"])
                     {
-                        var incident = ctx.InputParameters["Target"] as Entity;
                         var now = DateTime.UtcNow;
                         incident["new_prior_statuscode"] = preTarget["statuscode"];
                         incident["new_statuscode_lastupdated"] = now;
@@ -91,7 +108,7 @@ namespace CrmPlugin
 
                 try
                 {
-                    //If we need complex logic
+                    //If we need complex logic or more expensive types of validation, put it here.
                 }
                 catch (FaultException<OrganizationServiceFault> ex)
                 {
