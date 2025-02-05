@@ -8,6 +8,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Workflow;
 using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Xrm.Sdk.Metadata;
+using Microsoft.Xrm.Sdk.Messages;
 
 
 namespace CrmWorkflow
@@ -28,7 +29,29 @@ namespace CrmWorkflow
 
             EntityReference incidentRef = IncidentReference.Get(context);
 
-            Entity incident = service.Retrieve("incident", incidentRef.Id, new ColumnSet());
+            Entity incident = service.Retrieve("incident", incidentRef.Id, new ColumnSet("statecode"));
+            if ((int) incident["statecode"] == 1 /*Resolved*/ ||
+                (int) incident["statuscode"] == 2 /*Cancelled*/)
+            {
+                // Ignore non-active Incidents
+                return;
+            }
+
+            // Skip Incidents already assigned a ServiceAppointment
+            var qryServiceAppointment = new QueryByAttribute();
+            qryServiceAppointment.Attributes.Add("regardingobjectid");
+            qryServiceAppointment.ColumnSet = new ColumnSet("activityid");
+            qryServiceAppointment.EntityName = "serviceappointment";
+            qryServiceAppointment.Values.Add(incident.Id);
+
+            var request = new RetrieveMultipleRequest
+            {
+                Query = qryServiceAppointment
+            };
+            if (((RetrieveMultipleResponse)service.Execute(request)).EntityCollection.TotalRecordCount > 0) {
+                // Incident already has one or more assignments, so no need to assign anymore
+                return;
+            }
 
             Guid lowPriorityQuestionTeamId = new Guid("<some support team for low (3) priority question>");
             Guid mediumPriorityQuestionTeamId = new Guid("<some support team for normal (2) priority question>");
